@@ -54,4 +54,4 @@ PRs accepted.
 
 ## License
 
-[MIT © Venkat Durgempudi.](../LICENSE)
+[MIT © Venkat Durgempudi.](/LICENSE)
