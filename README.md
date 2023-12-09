@@ -3,32 +3,35 @@ Learning resources related to Oracle SQL
 
 ## Table of Contents
 
-- [Security](#security)
-- [Background](#background)
-- [Install](#install)
-- [Usage](#usage)
-- [API](#api)
+- [SQL Basics](#sql-basics)
+- [SQL Advanced](#sql-advanced)
+- [Place Holder1](#place-holder1)
+- [Place Holder2](#place-holder2)
 - [Contributing](#contributing)
 - [License](#license)
 
-## Security
+## SQL Basics
 
 ### Any optional sections
 
-## Background
 
-### Any optional sections
-
-## Install
+## SQL Advanced
 
 This module depends upon a knowledge of [Markdown]().
 
 ```
 ```
 
+## Place Holder1
+
 ### Any optional sections
 
-## Usage
+## Place Holder2
+
+### Any optional sections
+
+### Any optional sections
+
 
 ```
 ```
@@ -37,11 +40,6 @@ Note: The `license` badge image link at the top of this file should be updated w
 
 ### Any optional sections
 
-## API
-
-### Any optional sections
-
-## More optional sections
 
 ## Contributing
 
