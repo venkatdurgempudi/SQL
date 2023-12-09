@@ -1,6 +1,6 @@
 
 # HR & OE Schemas
-> we are going to use Oracle sample schemas for Practise
+> We are going to use Oracle sample schemas for Practise
 
 
 ### Refer to below links for more details
