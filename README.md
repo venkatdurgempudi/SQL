@@ -4,6 +4,8 @@ Learning resources related to Oracle SQL
 ## Table of Contents
 
 - [SQL Basics](#sql-basics)
+  	- [Generator](#generator)
+    - [Generator](#generator)
 - [SQL Advanced](#sql-advanced)
 - [Place Holder1](#place-holder1)
 - [Place Holder2](#place-holder2)
