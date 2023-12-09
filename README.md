@@ -1,5 +1,7 @@
 # SQL
+
 Learning resources related to Oracle SQL
+
 
 ## Table of Contents
 
