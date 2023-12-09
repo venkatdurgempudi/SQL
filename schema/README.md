@@ -13,4 +13,6 @@
 
 ![image](https://github.com/venkatdurgempudi/SQL/assets/15828692/d32fcffd-1a88-474f-821e-efc0fc1b5894)
 
-[Oracle PDF Material](/pdf/database-sample-schemas.pdf) 
+
+### Oracle PDF Material
+> <a href="pdfs/database-sample-schemas.pdf" class="image fit"><img src="images/database-sample-schemas.png" alt=""></a>
