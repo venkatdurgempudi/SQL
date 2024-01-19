@@ -1,6 +1,8 @@
-# SQL
+# SQL  
 
-Learning resources related to Oracle SQL
+
+
+### Learning resources related to Oracle SQL
 
 [Oracle LiveSQL Terminal](https://livesql.oracle.com/apex/f?p=590:1000:1223188389058:::::)  
 [Oracle DevGym](https://devgym.oracle.com/pls/apex/f?p=10001:1204:115604496945342:::::)  
@@ -9,7 +11,7 @@ Learning resources related to Oracle SQL
 <br>  
 
 
-## Oracle 11g Installation:  
+### Oracle 11g Installation:  
 
 [Oracle Database XE Prior Release Archive](http://web.archive.org/web/20210204141448/https://www.oracle.com/database/technologies/xe-prior-releases.html)   
 
