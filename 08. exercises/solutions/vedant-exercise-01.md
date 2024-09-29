@@ -228,3 +228,197 @@ ORDER BY TOTAL_ORDER_AMOUNT DESC;
 ---
 
 
+### 21. Retrieve all customers whose account creation date is earlier than the current year and who have placed orders this year.
+```sql
+SELECT DISTINCT C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+WHERE C.ACCOUNT_CREATION_DATE < TRUNC(SYSDATE, 'YYYY')
+  AND O.ORDER_DATE >= TRUNC(SYSDATE, 'YYYY');
+```
+
+---
+
+### 22. Find customers who placed orders totaling more than 3000 but have not placed an order in the last 6 months.
+```sql
+SELECT C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME, SUM(O.ORDER_AMOUNT) AS TOTAL_SPENT
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+GROUP BY C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME
+HAVING SUM(O.ORDER_AMOUNT) > 3000
+   AND MAX(O.ORDER_DATE) < ADD_MONTHS(SYSDATE, -6);
+```
+
+---
+
+### 23. Retrieve the total amount of orders placed on each day of January 2021.
+```sql
+SELECT O.ORDER_DATE, SUM(O.ORDER_AMOUNT) AS TOTAL_ORDER_AMOUNT
+FROM Orders O
+WHERE O.ORDER_DATE >= TO_DATE('2021-01-01', 'YYYY-MM-DD')
+  AND O.ORDER_DATE < TO_DATE('2021-02-01', 'YYYY-MM-DD')
+GROUP BY O.ORDER_DATE
+ORDER BY O.ORDER_DATE;
+```
+
+---
+
+### 24. Calculate the average number of orders per customer for customers from California.
+```sql
+SELECT AVG(OrderCounts.ORDER_COUNT) AS AVG_ORDERS_PER_CUSTOMER
+FROM (
+    SELECT C.CUSTOMER_ID, COUNT(O.ORDER_ID) AS ORDER_COUNT
+    FROM Customers C
+    LEFT JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+    WHERE C.STATE = 'California'
+    GROUP BY C.CUSTOMER_ID
+) OrderCounts;
+```
+
+---
+
+### 25. Find customers who have placed orders every month since their account creation date.
+```sql
+WITH MonthlyOrders AS (
+    SELECT C.CUSTOMER_ID, COUNT(DISTINCT EXTRACT(YEAR FROM O.ORDER_DATE) || '-' || EXTRACT(MONTH FROM O.ORDER_DATE)) AS MONTHS_ORDERED
+    FROM Customers C
+    JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+    WHERE O.ORDER_DATE >= C.ACCOUNT_CREATION_DATE
+    GROUP BY C.CUSTOMER_ID
+)
+SELECT C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME
+FROM Customers C
+JOIN MonthlyOrders MO ON C.CUSTOMER_ID = MO.CUSTOMER_ID
+WHERE MO.MONTHS_ORDERED = MONTHS_BETWEEN(TRUNC(SYSDATE), C.ACCOUNT_CREATION_DATE);
+```
+
+---
+
+### 26. Retrieve the maximum, minimum, and average order amounts for customers whose account creation date is in 2020.
+```sql
+SELECT MAX(O.ORDER_AMOUNT) AS MAX_ORDER_AMOUNT,
+       MIN(O.ORDER_AMOUNT) AS MIN_ORDER_AMOUNT,
+       AVG(O.ORDER_AMOUNT) AS AVG_ORDER_AMOUNT
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+WHERE C.ACCOUNT_CREATION_DATE >= TO_DATE('2020-01-01', 'YYYY-MM-DD')
+  AND C.ACCOUNT_CREATION_DATE < TO_DATE('2021-01-01', 'YYYY-MM-DD');
+```
+
+---
+
+### 27. List the total number of orders and total amount spent for customers with more than 3 orders.
+```sql
+SELECT C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME, COUNT(O.ORDER_ID) AS TOTAL_ORDERS, SUM(O.ORDER_AMOUNT) AS TOTAL_SPENT
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+GROUP BY C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME
+HAVING COUNT(O.ORDER_ID) > 3;
+```
+
+---
+
+### 28. Retrieve customers who have placed orders in more than one city and display their total order amount.
+```sql
+SELECT C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME, SUM(O.ORDER_AMOUNT) AS TOTAL_SPENT
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+JOIN Customers C2 ON O.CUSTOMER_ID = C2.CUSTOMER_ID
+GROUP BY C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME
+HAVING COUNT(DISTINCT C2.CITY) > 1;
+```
+
+---
+
+### 29. Find customers who placed an order with an amount above 1000 but did not place any orders in the previous year.
+```sql
+SELECT DISTINCT C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+WHERE O.ORDER_AMOUNT > 1000
+  AND C.CUSTOMER_ID NOT IN (
+    SELECT O.CUSTOMER_ID
+    FROM Orders O
+    WHERE O.ORDER_DATE < TO_DATE('2021-01-01', 'YYYY-MM-DD')
+      AND O.ORDER_DATE >= TO_DATE('2020-01-01', 'YYYY-MM-DD')
+);
+```
+
+---
+
+### 30. Show the total number of orders and the total amount spent by customers whose first names are at least 6 characters long.
+```sql
+SELECT COUNT(O.ORDER_ID) AS TOTAL_ORDERS, SUM(O.ORDER_AMOUNT) AS TOTAL_SPENT
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+WHERE LENGTH(C.FIRST_NAME) >= 6;
+```
+
+---
+
+### 31. Retrieve all customers who placed an order in 2021 and have not placed another order since then.
+```sql
+SELECT DISTINCT C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+WHERE O.ORDER_DATE BETWEEN TO_DATE('2021-01-01', 'YYYY-MM-DD') AND TO_DATE('2021-12-31', 'YYYY-MM-DD')
+  AND C.CUSTOMER_ID NOT IN (
+    SELECT O.CUSTOMER_ID
+    FROM Orders O
+    WHERE O.ORDER_DATE > TO_DATE('2021-12-31', 'YYYY-MM-DD')
+);
+```
+
+---
+
+### 32. List the total number of customers and the average order amount for customers who placed orders in at least 3 different months.
+```sql
+SELECT COUNT(DISTINCT C.CUSTOMER_ID) AS TOTAL_CUSTOMERS, AVG(O.ORDER_AMOUNT) AS AVG_ORDER_AMOUNT
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+GROUP BY C.CUSTOMER_ID
+HAVING COUNT(DISTINCT EXTRACT(YEAR FROM O.ORDER_DATE) || '-' || EXTRACT(MONTH FROM O.ORDER_DATE)) >= 3;
+```
+
+---
+
+### 33. Find the percentage of customers from New York who placed orders above 2000.
+```sql
+WITH TotalCustomers AS (
+    SELECT COUNT(*) AS TOTAL FROM Customers WHERE CITY = 'New York'
+),
+HighValueCustomers AS (
+    SELECT COUNT(DISTINCT C.CUSTOMER_ID) AS HIGH_VALUE_TOTAL
+    FROM Customers C
+    JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+    WHERE C.CITY = 'New York' AND O.ORDER_AMOUNT > 2000
+)
+SELECT (HIGH_VALUE_TOTAL * 100.0 / TOTAL) AS PERCENTAGE_HIGH_VALUE_CUSTOMERS
+FROM TotalCustomers, HighValueCustomers;
+```
+
+---
+
+### 34. Show the difference between the total order amount of customers in California and those in Texas.
+```sql
+SELECT 
+    (SELECT SUM(O.ORDER_AMOUNT) FROM Customers C JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID WHERE C.STATE = 'California') AS TOTAL_CA,
+    (SELECT SUM(O.ORDER_AMOUNT) FROM Customers C JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID WHERE C.STATE = 'Texas') AS TOTAL_TX,
+    (SELECT SUM(O.ORDER_AMOUNT) FROM Customers C JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID WHERE C.STATE = 'California') -
+    (SELECT SUM(O.ORDER_AMOUNT) FROM Customers C JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID WHERE C.STATE = 'Texas') AS DIFFERENCE;
+```
+
+---
+
+### 35. Retrieve all customers who placed at least one order in the last 30 days and show their total order amount.
+```sql
+SELECT C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME, SUM(O.ORDER_AMOUNT) AS TOTAL_ORDER_AMOUNT
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+WHERE O.ORDER_DATE >= SYSDATE - 30
+GROUP BY C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME;
+```
+
+---
+
+
