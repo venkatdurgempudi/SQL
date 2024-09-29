@@ -1,8 +1,5 @@
 ### **Solutions**
 
----
-
-Here are the SQL solutions for the provided queries:
 
 ---
 
