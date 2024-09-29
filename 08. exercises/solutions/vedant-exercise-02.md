@@ -1,4 +1,4 @@
-
+# Solutions
 
 **1. Retrieve the names of customers who have placed the most orders on the first day of each quarter for the past three years.**
 ```sql
