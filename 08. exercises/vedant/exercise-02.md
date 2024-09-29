@@ -1,4 +1,114 @@
+# **50 SQL Questions**  
+The questions combine various subtopics like single-row functions, aggregate functions, joins, and other operations.
 
+
+<br>  
+
+<br>  
+
+  
+## Below is DDL & DML for the `CUSTOMERS` and `ORDERS` tables.  
+
+
+
+### **DDL for `CUSTOMERS` Table**
+
+```sql
+CREATE TABLE CUSTOMERS (
+    CUSTOMER_ID NUMBER PRIMARY KEY,
+    FIRST_NAME VARCHAR2(50),
+    LAST_NAME VARCHAR2(50),
+    EMAIL VARCHAR2(100),
+    CITY VARCHAR2(50),
+    ACCOUNT_CREATION_DATE DATE
+);
+```
+
+### **DDL for `ORDERS` Table**
+
+```sql
+CREATE TABLE ORDERS (
+    ORDER_ID NUMBER PRIMARY KEY,
+    CUSTOMER_ID NUMBER,
+    ORDER_DATE DATE,
+    ORDER_AMOUNT NUMBER(10, 2),
+    FOREIGN KEY (CUSTOMER_ID) REFERENCES CUSTOMERS(CUSTOMER_ID)
+);
+```
+
+
+### **Complete Dataset (DML for `CUSTOMERS` Table - 200 rows)**
+
+```sql
+INSERT INTO CUSTOMERS (CUSTOMER_ID, FIRST_NAME, LAST_NAME, EMAIL, CITY, ACCOUNT_CREATION_DATE)
+VALUES (1, 'Aaron', 'Johnson', 'aaron.johnson@example.com', 'New York', TO_DATE('12-JAN-2021', 'DD-MON-YYYY'));
+
+INSERT INTO CUSTOMERS (CUSTOMER_ID, FIRST_NAME, LAST_NAME, EMAIL, CITY, ACCOUNT_CREATION_DATE)
+VALUES (2, 'Alex', 'Davidson', 'alex.davidson@example.com', 'Los Angeles', TO_DATE('08-MAR-2020', 'DD-MON-YYYY'));
+
+INSERT INTO CUSTOMERS (CUSTOMER_ID, FIRST_NAME, LAST_NAME, EMAIL, CITY, ACCOUNT_CREATION_DATE)
+VALUES (3, 'Ben', 'Miller', 'ben.miller@example.com', 'Chicago', TO_DATE('01-FEB-2021', 'DD-MON-YYYY'));
+
+INSERT INTO CUSTOMERS (CUSTOMER_ID, FIRST_NAME, LAST_NAME, EMAIL, CITY, ACCOUNT_CREATION_DATE)
+VALUES (4, 'Catherine', 'Stewart', 'catherine.stewart@example.com', 'New York', TO_DATE('15-SEP-2021', 'DD-MON-YYYY'));
+
+INSERT INTO CUSTOMERS (CUSTOMER_ID, FIRST_NAME, LAST_NAME, EMAIL, CITY, ACCOUNT_CREATION_DATE)
+VALUES (5, 'Diana', 'Green', 'diana.green@example.com', 'San Francisco', TO_DATE('22-MAY-2022', 'DD-MON-YYYY'));
+
+-- Repeat similar inserts to create a total of 200 customers
+
+-- Auto-generate customer data using a loop in your preferred method
+-- Example for generating a few rows at a time:
+DECLARE
+    v_id NUMBER := 6;
+BEGIN
+    FOR i IN 1..195 LOOP
+        INSERT INTO CUSTOMERS (CUSTOMER_ID, FIRST_NAME, LAST_NAME, EMAIL, CITY, ACCOUNT_CREATION_DATE)
+        VALUES (v_id, 'Customer'||i, 'Last'||i, 'customer'||i||'@example.com', 'City'||MOD(i, 5), SYSDATE - i*30);
+        v_id := v_id + 1;
+    END LOOP;
+END;
+/
+```
+
+
+### **Complete Dataset (DML for `ORDERS` Table - 200 rows)**
+
+```sql
+INSERT INTO ORDERS (ORDER_ID, CUSTOMER_ID, ORDER_DATE, ORDER_AMOUNT)
+VALUES (101, 1, TO_DATE('15-JAN-2021', 'DD-MON-YYYY'), 1500.75);
+
+INSERT INTO ORDERS (ORDER_ID, CUSTOMER_ID, ORDER_DATE, ORDER_AMOUNT)
+VALUES (102, 2, TO_DATE('20-MAR-2020', 'DD-MON-YYYY'), 250.00);
+
+INSERT INTO ORDERS (ORDER_ID, CUSTOMER_ID, ORDER_DATE, ORDER_AMOUNT)
+VALUES (103, 3, TO_DATE('25-FEB-2021', 'DD-MON-YYYY'), 980.60);
+
+INSERT INTO ORDERS (ORDER_ID, CUSTOMER_ID, ORDER_DATE, ORDER_AMOUNT)
+VALUES (104, 1, TO_DATE('10-AUG-2021', 'DD-MON-YYYY'), 520.45);
+
+INSERT INTO ORDERS (ORDER_ID, CUSTOMER_ID, ORDER_DATE, ORDER_AMOUNT)
+VALUES (105, 4, TO_DATE('12-NOV-2021', 'DD-MON-YYYY'), 2200.10);
+
+-- Repeat similar inserts to create a total of 200 orders
+DECLARE
+    v_id NUMBER := 106;
+BEGIN
+    FOR i IN 1..195 LOOP
+        INSERT INTO ORDERS (ORDER_ID, CUSTOMER_ID, ORDER_DATE, ORDER_AMOUNT)
+        VALUES (v_id, MOD(i, 200) + 1, SYSDATE - i*15, ROUND(DBMS_RANDOM.VALUE(100, 5000), 2));
+        v_id := v_id + 1;
+    END LOOP;
+END;
+/
+```
+
+
+<br>  
+<br>  
+
+
+## Assignment 
 
 1. Retrieve the names of customers who have placed the most orders on the first day of each quarter for the past three years.  
 2. Find the customers whose total order amount, over all their orders, is a perfect square and display their total order count.  
