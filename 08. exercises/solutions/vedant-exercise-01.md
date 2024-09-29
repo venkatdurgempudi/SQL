@@ -422,3 +422,217 @@ GROUP BY C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME;
 ---
 
 
+### 36. Find the customer who placed the highest number of orders and display the total amount they spent.
+```sql
+SELECT C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME, COUNT(O.ORDER_ID) AS TOTAL_ORDERS, SUM(O.ORDER_AMOUNT) AS TOTAL_SPENT
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+GROUP BY C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME
+ORDER BY TOTAL_ORDERS DESC
+FETCH FIRST 1 ROW ONLY;
+```
+
+---
+
+### 37. Retrieve the first and last name of customers who placed an order exactly 6 months after their account creation date.
+```sql
+SELECT C.FIRST_NAME, C.LAST_NAME
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+WHERE O.ORDER_DATE = ADD_MONTHS(C.ACCOUNT_CREATION_DATE, 6);
+```
+
+---
+
+### 38. List customers whose first order amount was more than twice the average order amount of all customers.
+```sql
+WITH AvgOrder AS (
+    SELECT AVG(ORDER_AMOUNT) AS AVG_ORDER_AMOUNT
+    FROM Orders
+),
+FirstOrders AS (
+    SELECT CUSTOMER_ID, MIN(ORDER_AMOUNT) AS FIRST_ORDER_AMOUNT
+    FROM Orders
+    GROUP BY CUSTOMER_ID
+)
+SELECT C.FIRST_NAME, C.LAST_NAME, FO.FIRST_ORDER_AMOUNT
+FROM Customers C
+JOIN FirstOrders FO ON C.CUSTOMER_ID = FO.CUSTOMER_ID
+WHERE FO.FIRST_ORDER_AMOUNT > 2 * (SELECT AVG_ORDER_AMOUNT FROM AvgOrder);
+```
+
+---
+
+### 39. Retrieve the last 3 orders placed by each customer in New York and their total amount.
+```sql
+SELECT C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME, O.ORDER_DATE, O.ORDER_AMOUNT
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+WHERE C.CITY = 'New York'
+ORDER BY O.ORDER_DATE DESC
+FETCH FIRST 3 ROWS ONLY;
+```
+
+---
+
+### 40. Find the number of customers who placed an order of more than 1000 in 2021 but did not place any orders in 2022.
+```sql
+SELECT COUNT(DISTINCT C.CUSTOMER_ID) AS TOTAL_CUSTOMERS
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+WHERE O.ORDER_AMOUNT > 1000 AND EXTRACT(YEAR FROM O.ORDER_DATE) = 2021
+AND C.CUSTOMER_ID NOT IN (
+    SELECT DISTINCT O2.CUSTOMER_ID
+    FROM Orders O2
+    WHERE EXTRACT(YEAR FROM O2.ORDER_DATE) = 2022
+);
+```
+
+---
+
+### 41. Show customers who placed at least 2 orders in the last 12 months and display their total amount spent.
+```sql
+SELECT C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME, SUM(O.ORDER_AMOUNT) AS TOTAL_SPENT
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+WHERE O.ORDER_DATE >= ADD_MONTHS(SYSDATE, -12)
+GROUP BY C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME
+HAVING COUNT(O.ORDER_ID) >= 2;
+```
+
+---
+
+### 42. Retrieve customers who placed orders with a total value higher than the median order amount of all customers.
+```sql
+WITH MedianOrder AS (
+    SELECT AVG(ORDER_AMOUNT) AS MEDIAN_ORDER_AMOUNT
+    FROM (
+        SELECT ORDER_AMOUNT
+        FROM Orders
+        ORDER BY ORDER_AMOUNT
+        OFFSET (SELECT COUNT(*) FROM Orders) / 2 ROWS
+        FETCH NEXT 1 ROW ONLY
+    )
+),
+CustomerTotals AS (
+    SELECT C.CUSTOMER_ID, SUM(O.ORDER_AMOUNT) AS TOTAL_ORDER_AMOUNT
+    FROM Customers C
+    JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+    GROUP BY C.CUSTOMER_ID
+)
+SELECT C.CUSTOMER_ID
+FROM CustomerTotals C
+WHERE C.TOTAL_ORDER_AMOUNT > (SELECT MEDIAN_ORDER_AMOUNT FROM MedianOrder);
+```
+
+---
+
+### 43. List customers whose order amount is within 20% of the highest order placed this year.
+```sql
+WITH MaxOrder AS (
+    SELECT MAX(ORDER_AMOUNT) AS MAX_ORDER_AMOUNT
+    FROM Orders
+    WHERE EXTRACT(YEAR FROM ORDER_DATE) = EXTRACT(YEAR FROM SYSDATE)
+)
+SELECT DISTINCT C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME, O.ORDER_AMOUNT
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+WHERE O.ORDER_AMOUNT BETWEEN 0.8 * (SELECT MAX_ORDER_AMOUNT FROM MaxOrder) 
+                         AND (SELECT MAX_ORDER_AMOUNT FROM MaxOrder);
+```
+
+---
+
+### 44. Find customers who placed orders in exactly 3 different months of the current year.
+```sql
+SELECT C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+WHERE EXTRACT(YEAR FROM O.ORDER_DATE) = EXTRACT(YEAR FROM SYSDATE)
+GROUP BY C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME
+HAVING COUNT(DISTINCT EXTRACT(MONTH FROM O.ORDER_DATE)) = 3;
+```
+
+---
+
+### 45. Retrieve the last name and total order amount of customers who placed their first order before turning 25.
+```sql
+SELECT C.LAST_NAME, SUM(O.ORDER_AMOUNT) AS TOTAL_ORDER_AMOUNT
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+WHERE C.ACCOUNT_CREATION_DATE <= ADD_MONTHS(TO_DATE(O.ORDER_DATE), -25 * 12)
+GROUP BY C.LAST_NAME;
+```
+
+---
+
+### 46. List all customers whose account creation date is in the current month and display their total order amount.
+```sql
+SELECT C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME, SUM(O.ORDER_AMOUNT) AS TOTAL_ORDER_AMOUNT
+FROM Customers C
+LEFT JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+WHERE EXTRACT(YEAR FROM C.ACCOUNT_CREATION_DATE) = EXTRACT(YEAR FROM SYSDATE)
+AND EXTRACT(MONTH FROM C.ACCOUNT_CREATION_DATE) = EXTRACT(MONTH FROM SYSDATE)
+GROUP BY C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME;
+```
+
+---
+
+### 47. Find customers who placed orders with a total value that is a multiple of 500.
+```sql
+SELECT C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME, SUM(O.ORDER_AMOUNT) AS TOTAL_ORDER_AMOUNT
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+GROUP BY C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME
+HAVING MOD(SUM(O.ORDER_AMOUNT), 500) = 0;
+```
+
+---
+
+### 48. Retrieve the first and last order dates for each customer and calculate the difference between them.
+```sql
+SELECT C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME,
+       MIN(O.ORDER_DATE) AS FIRST_ORDER_DATE,
+       MAX(O.ORDER_DATE) AS LAST_ORDER_DATE,
+       MAX(O.ORDER_DATE) - MIN(O.ORDER_DATE) AS ORDER_DATE_DIFFERENCE
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+GROUP BY C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME;
+```
+
+---
+
+### 49. Show customers who placed an order more than 2 years after their account creation date.
+```sql
+SELECT C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+WHERE O.ORDER_DATE > ADD_MONTHS(C.ACCOUNT_CREATION_DATE, 24);
+```
+
+---
+
+### 50. Find the customers who placed orders with an amount greater than the average of their previous 3 orders.
+```sql
+WITH PreviousOrders AS (
+    SELECT CUSTOMER_ID, ORDER_DATE, ORDER_AMOUNT,
+           ROW_NUMBER() OVER (PARTITION BY CUSTOMER_ID ORDER BY ORDER_DATE DESC) AS RN
+    FROM Orders
+),
+AvgPreviousOrders AS (
+    SELECT CUSTOMER_ID, AVG(ORDER_AMOUNT) AS AVG_PREVIOUS_ORDER
+    FROM PreviousOrders
+    WHERE RN <= 3
+    GROUP BY CUSTOMER_ID
+)
+SELECT C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME, O.ORDER_AMOUNT
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+JOIN AvgPreviousOrders A ON C.CUSTOMER_ID = A.CUSTOMER_ID
+WHERE O.ORDER_AMOUNT > A.AVG_PREVIOUS_ORDER;
+```
+
+---
+
+
+
