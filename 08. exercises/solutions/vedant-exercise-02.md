@@ -869,4 +869,127 @@ GROUP BY C.CUSTOMER_NAME;
 
 ---
 
+### 46. Identify customers whose orders reflect an increase in order value but a decrease in frequency and display their total order amounts.
+```sql
+WITH OrderTrends AS (
+    SELECT CUSTOMER_ID,
+           COUNT(ORDER_ID) AS ORDER_COUNT,
+           AVG(ORDER_AMOUNT) AS AVG_ORDER_AMOUNT,
+           ROW_NUMBER() OVER (PARTITION BY CUSTOMER_ID ORDER BY EXTRACT(YEAR FROM ORDER_DATE)) AS YEAR_RANK
+    FROM Orders
+    GROUP BY CUSTOMER_ID, EXTRACT(YEAR FROM ORDER_DATE)
+),
+TrendsComparison AS (
+    SELECT CUSTOMER_ID,
+           LAG(ORDER_COUNT) OVER (PARTITION BY CUSTOMER_ID ORDER BY YEAR_RANK) AS PREV_ORDER_COUNT,
+           LAG(AVG_ORDER_AMOUNT) OVER (PARTITION BY CUSTOMER_ID ORDER BY YEAR_RANK) AS PREV_AVG_ORDER_AMOUNT,
+           AVG_ORDER_AMOUNT
+    FROM OrderTrends
+)
+SELECT C.CUSTOMER_NAME, SUM(O.ORDER_AMOUNT) AS TOTAL_ORDER_AMOUNT
+FROM Customers C
+JOIN TrendsComparison T ON C.CUSTOMER_ID = T.CUSTOMER_ID
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+WHERE T.ORDER_COUNT < T.PREV_ORDER_COUNT AND T.AVG_ORDER_AMOUNT > T.PREV_AVG_ORDER_AMOUNT
+GROUP BY C.CUSTOMER_NAME;
+```
+
+---
+
+### 47. Find customers who have been inactive for the longest time and display their total order count before inactivity began.
+```sql
+WITH InactiveCustomers AS (
+    SELECT CUSTOMER_ID, 
+           MAX(ORDER_DATE) AS LAST_ORDER_DATE
+    FROM Orders
+    GROUP BY CUSTOMER_ID
+),
+InactiveDuration AS (
+    SELECT C.CUSTOMER_ID, 
+           C.CUSTOMER_NAME, 
+           COUNT(O.ORDER_ID) AS TOTAL_ORDERS_BEFORE_INACTIVE,
+           TRUNC(SYSDATE - LAST_ORDER_DATE) AS DAYS_INACTIVE
+    FROM InactiveCustomers IC
+    JOIN Customers C ON IC.CUSTOMER_ID = C.CUSTOMER_ID
+    LEFT JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID AND O.ORDER_DATE < IC.LAST_ORDER_DATE
+    GROUP BY C.CUSTOMER_ID, C.CUSTOMER_NAME, IC.LAST_ORDER_DATE
+)
+SELECT CUSTOMER_NAME, TOTAL_ORDERS_BEFORE_INACTIVE, DAYS_INACTIVE
+FROM InactiveDuration
+ORDER BY DAYS_INACTIVE DESC
+FETCH FIRST 1 ROW ONLY;  -- Customer inactive for the longest time
+```
+
+---
+
+### 48. Retrieve customers who have made purchases from multiple categories and show their total spending across those categories.
+```sql
+WITH CategorySpending AS (
+    SELECT C.CUSTOMER_ID,
+           P.PRODUCT_CATEGORY,
+           SUM(O.ORDER_AMOUNT) AS TOTAL_SPENT
+    FROM Orders O
+    JOIN Products P ON O.PRODUCT_ID = P.PRODUCT_ID
+    JOIN Customers C ON O.CUSTOMER_ID = C.CUSTOMER_ID
+    GROUP BY C.CUSTOMER_ID, P.PRODUCT_CATEGORY
+),
+MultipleCategories AS (
+    SELECT CUSTOMER_ID, SUM(TOTAL_SPENT) AS TOTAL_SPENDING
+    FROM CategorySpending
+    GROUP BY CUSTOMER_ID
+    HAVING COUNT(DISTINCT PRODUCT_CATEGORY) > 1
+)
+SELECT C.CUSTOMER_NAME, M.TOTAL_SPENDING
+FROM Customers C
+JOIN MultipleCategories M ON C.CUSTOMER_ID = M.CUSTOMER_ID;
+```
+
+---
+
+### 49. List customers whose orders include unique order amounts that differ from their average order amount and display their total orders.
+```sql
+WITH CustomerOrders AS (
+    SELECT CUSTOMER_ID, 
+           ORDER_AMOUNT,
+           AVG(ORDER_AMOUNT) OVER (PARTITION BY CUSTOMER_ID) AS AVG_ORDER_AMOUNT
+    FROM Orders
+),
+UniqueOrders AS (
+    SELECT CUSTOMER_ID, 
+           COUNT(ORDER_ID) AS TOTAL_ORDERS
+    FROM CustomerOrders
+    WHERE ORDER_AMOUNT <> AVG_ORDER_AMOUNT
+    GROUP BY CUSTOMER_ID
+)
+SELECT C.CUSTOMER_NAME, U.TOTAL_ORDERS
+FROM Customers C
+JOIN UniqueOrders U ON C.CUSTOMER_ID = U.CUSTOMER_ID;
+```
+
+---
+
+### 50. Find customers who have an increasing order amount pattern during the last six months and display their total orders and average order amount.
+```sql
+WITH RecentOrders AS (
+    SELECT CUSTOMER_ID,
+           ORDER_DATE,
+           ORDER_AMOUNT,
+           ROW_NUMBER() OVER (PARTITION BY CUSTOMER_ID ORDER BY ORDER_DATE) AS ORDER_RANK
+    FROM Orders
+    WHERE ORDER_DATE >= ADD_MONTHS(SYSDATE, -6)  -- Last six months
+),
+IncreasingOrders AS (
+    SELECT CUSTOMER_ID,
+           COUNT(ORDER_ID) AS TOTAL_ORDERS,
+           AVG(ORDER_AMOUNT) AS AVG_ORDER_AMOUNT
+    FROM RecentOrders
+    WHERE ORDER_AMOUNT > LAG(ORDER_AMOUNT) OVER (PARTITION BY CUSTOMER_ID ORDER BY ORDER_RANK)
+    GROUP BY CUSTOMER_ID
+)
+SELECT C.CUSTOMER_NAME, I.TOTAL_ORDERS, I.AVG_ORDER_AMOUNT
+FROM Customers C
+JOIN IncreasingOrders I ON C.CUSTOMER_ID = I.CUSTOMER_ID;
+```
+
+---
 
