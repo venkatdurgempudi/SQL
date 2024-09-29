@@ -453,5 +453,420 @@ GROUP BY C.CUSTOMER_NAME;
 
 ---
 
+### 26. Show customers who have placed more than one order on the same day in the same month for the last three years and display their total orders.
+```sql
+WITH DailyOrderCounts AS (
+    SELECT CUSTOMER_ID, 
+           TO_CHAR(ORDER_DATE, 'DD-MM') AS ORDER_DAY_MONTH, 
+           COUNT(ORDER_ID) AS ORDER_COUNT
+    FROM Orders
+    WHERE ORDER_DATE >= ADD_MONTHS(SYSDATE, -36)  -- Last 3 years
+    GROUP BY CUSTOMER_ID, TO_CHAR(ORDER_DATE, 'DD-MM')
+    HAVING COUNT(ORDER_ID) > 1
+)
+SELECT C.CUSTOMER_NAME, COUNT(O.ORDER_ID) AS TOTAL_ORDERS
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+JOIN DailyOrderCounts D ON C.CUSTOMER_ID = D.CUSTOMER_ID
+GROUP BY C.CUSTOMER_NAME;
+```
 
-Feel free to adjust any queries as needed for your specific data structures or requirements!
+---
+
+### 27. Identify customers who have orders with an amount that is a power of two and list their total orders.
+```sql
+WITH PowerOfTwoOrders AS (
+    SELECT CUSTOMER_ID, COUNT(ORDER_ID) AS TOTAL_ORDERS
+    FROM Orders
+    WHERE ORDER_AMOUNT > 0 AND (ORDER_AMOUNT & (ORDER_AMOUNT - 1)) = 0  -- Power of two condition
+    GROUP BY CUSTOMER_ID
+)
+SELECT C.CUSTOMER_NAME, P.TOTAL_ORDERS
+FROM Customers C
+JOIN PowerOfTwoOrders P ON C.CUSTOMER_ID = P.CUSTOMER_ID;
+```
+
+---
+
+### 28. Retrieve customers who have spent more than 2000 in one order but have an average order amount of less than 500 overall.
+```sql
+WITH CustomerStats AS (
+    SELECT CUSTOMER_ID, 
+           AVG(ORDER_AMOUNT) AS AVG_ORDER_AMOUNT,
+           MAX(ORDER_AMOUNT) AS MAX_ORDER_AMOUNT
+    FROM Orders
+    GROUP BY CUSTOMER_ID
+)
+SELECT C.CUSTOMER_NAME
+FROM Customers C
+JOIN CustomerStats S ON C.CUSTOMER_ID = S.CUSTOMER_ID
+WHERE S.MAX_ORDER_AMOUNT > 2000 AND S.AVG_ORDER_AMOUNT < 500;
+```
+
+---
+
+### 29. List customers who placed the highest order on the last day of the year and show their total order amount for that year.
+```sql
+WITH LastDayOrders AS (
+    SELECT CUSTOMER_ID, 
+           SUM(ORDER_AMOUNT) AS TOTAL_YEAR_AMOUNT
+    FROM Orders
+    WHERE TO_CHAR(ORDER_DATE, 'MM-DD') = '12-31'  -- Last day of the year
+    GROUP BY CUSTOMER_ID
+),
+HighestOrder AS (
+    SELECT CUSTOMER_ID, MAX(ORDER_AMOUNT) AS MAX_ORDER
+    FROM Orders
+    WHERE TO_CHAR(ORDER_DATE, 'MM-DD') = '12-31'
+    GROUP BY CUSTOMER_ID
+)
+SELECT C.CUSTOMER_NAME, L.TOTAL_YEAR_AMOUNT
+FROM Customers C
+JOIN LastDayOrders L ON C.CUSTOMER_ID = L.CUSTOMER_ID
+JOIN HighestOrder H ON C.CUSTOMER_ID = H.CUSTOMER_ID
+WHERE H.MAX_ORDER = (SELECT MAX(MAX_ORDER) FROM HighestOrder);
+```
+
+---
+
+### 30. Find customers whose total amount spent in the last month is greater than the total amount spent in the previous month and display their total orders.
+```sql
+WITH MonthlySpending AS (
+    SELECT CUSTOMER_ID, 
+           SUM(CASE WHEN ORDER_DATE >= TRUNC(SYSDATE, 'MM') THEN ORDER_AMOUNT ELSE 0 END) AS LAST_MONTH,
+           SUM(CASE WHEN ORDER_DATE >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -1) AND ORDER_DATE < TRUNC(SYSDATE, 'MM') THEN ORDER_AMOUNT ELSE 0 END) AS PREVIOUS_MONTH
+    FROM Orders
+    GROUP BY CUSTOMER_ID
+)
+SELECT C.CUSTOMER_NAME, COUNT(O.ORDER_ID) AS TOTAL_ORDERS
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+JOIN MonthlySpending M ON C.CUSTOMER_ID = M.CUSTOMER_ID
+WHERE M.LAST_MONTH > M.PREVIOUS_MONTH
+GROUP BY C.CUSTOMER_NAME;
+```
+
+---
+
+### 31. Retrieve customers who placed at least one order during each month of a specific quarter and show their total order amount.
+```sql
+WITH QuarterOrders AS (
+    SELECT CUSTOMER_ID, 
+           EXTRACT(MONTH FROM ORDER_DATE) AS ORDER_MONTH,
+           SUM(ORDER_AMOUNT) AS TOTAL_ORDER_AMOUNT
+    FROM Orders
+    WHERE ORDER_DATE >= TO_DATE('01-JAN-2024', 'DD-MON-YYYY') AND ORDER_DATE < TO_DATE('01-APR-2024', 'DD-MON-YYYY')  -- Adjust quarter as needed
+    GROUP BY CUSTOMER_ID, EXTRACT(MONTH FROM ORDER_DATE)
+)
+SELECT C.CUSTOMER_NAME, SUM(Q.TOTAL_ORDER_AMOUNT) AS TOTAL_ORDER_AMOUNT
+FROM Customers C
+JOIN QuarterOrders Q ON C.CUSTOMER_ID = Q.CUSTOMER_ID
+GROUP BY C.CUSTOMER_NAME
+HAVING COUNT(DISTINCT Q.ORDER_MONTH) = 3;  -- Ensures orders in all three months of the quarter
+```
+
+---
+
+### 32. Identify customers whose orders show a cyclic pattern of spending (e.g., high-low-high-low) over a period of time and display their total orders.
+```sql
+WITH OrderPatterns AS (
+    SELECT CUSTOMER_ID, 
+           ORDER_DATE, 
+           ORDER_AMOUNT,
+           LAG(ORDER_AMOUNT, 1) OVER (PARTITION BY CUSTOMER_ID ORDER BY ORDER_DATE) AS PREV_ORDER_AMOUNT,
+           LAG(ORDER_AMOUNT, 2) OVER (PARTITION BY CUSTOMER_ID ORDER BY ORDER_DATE) AS PREV2_ORDER_AMOUNT
+    FROM Orders
+)
+SELECT C.CUSTOMER_NAME, COUNT(O.ORDER_ID) AS TOTAL_ORDERS
+FROM Customers C
+JOIN OrderPatterns P ON C.CUSTOMER_ID = P.CUSTOMER_ID
+WHERE (P.ORDER_AMOUNT > P.PREV_ORDER_AMOUNT AND P.PREV_ORDER_AMOUNT < P.PREV2_ORDER_AMOUNT)
+   OR (P.ORDER_AMOUNT < P.PREV_ORDER_AMOUNT AND P.PREV_ORDER_AMOUNT > P.PREV2_ORDER_AMOUNT)
+GROUP BY C.CUSTOMER_NAME;
+```
+
+---
+
+### 33. Show customers who have a higher order count but lower order amounts compared to their peers and display their average order amount.
+```sql
+WITH CustomerStats AS (
+    SELECT CUSTOMER_ID, 
+           COUNT(ORDER_ID) AS ORDER_COUNT, 
+           SUM(ORDER_AMOUNT) AS TOTAL_AMOUNT,
+           AVG(ORDER_AMOUNT) AS AVG_AMOUNT
+    FROM Orders
+    GROUP BY CUSTOMER_ID
+),
+PeerStats AS (
+    SELECT AVG(AVG_AMOUNT) AS AVG_PEER_AMOUNT
+    FROM CustomerStats
+)
+SELECT C.CUSTOMER_NAME, S.ORDER_COUNT, S.AVG_AMOUNT
+FROM Customers C
+JOIN CustomerStats S ON C.CUSTOMER_ID = S.CUSTOMER_ID
+JOIN PeerStats P ON S.AVG_AMOUNT < P.AVG_PEER_AMOUNT
+WHERE S.ORDER_COUNT > (SELECT AVG(ORDER_COUNT) FROM CustomerStats);
+```
+
+---
+
+### 34. Find customers who placed orders on the same date every year for three consecutive years and display their total orders.
+```sql
+WITH YearlyOrders AS (
+    SELECT CUSTOMER_ID, 
+           TO_CHAR(ORDER_DATE, 'MM-DD') AS ORDER_DATE,
+           COUNT(DISTINCT EXTRACT(YEAR FROM ORDER_DATE)) AS DISTINCT_YEARS
+    FROM Orders
+    WHERE ORDER_DATE >= ADD_MONTHS(SYSDATE, -36)  -- Last 3 years
+    GROUP BY CUSTOMER_ID, TO_CHAR(ORDER_DATE, 'MM-DD')
+)
+SELECT C.CUSTOMER_NAME, SUM(O.ORDER_AMOUNT) AS TOTAL_ORDERS
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+JOIN YearlyOrders Y ON C.CUSTOMER_ID = Y.CUSTOMER_ID
+WHERE Y.DISTINCT_YEARS = 3
+GROUP BY C.CUSTOMER_NAME;
+```
+
+---
+
+### 35. List customers whose orders have an amount that is a significant outlier compared to the average order amounts of their peers.
+```sql
+WITH CustomerStats AS (
+    SELECT CUSTOMER_ID, 
+           AVG(ORDER_AMOUNT) AS AVG_ORDER_AMOUNT,
+           STDDEV(ORDER_AMOUNT) AS STDDEV_ORDER_AMOUNT
+    FROM Orders
+    GROUP BY CUSTOMER_ID
+),
+OutlierCustomers AS (
+    SELECT CUSTOMER_ID, AVG_ORDER_AMOUNT
+    FROM CustomerStats
+    WHERE AVG_ORDER_AMOUNT > (SELECT AVG(AVG_ORDER_AMOUNT) + 2 * AVG(STDDEV_ORDER_AMOUNT) FROM CustomerStats)  -- Assuming outlier is > mean + 2*stddev
+)
+SELECT C.CUSTOMER_NAME
+FROM Customers C
+JOIN OutlierCustomers O ON C.CUSTOMER_ID = O.CUSTOMER_ID;
+```
+
+---
+
+### 36. Retrieve customers whose order history reflects a seasonal trend (e.g., higher in December) and show their total order amounts for those seasons.
+```sql
+WITH SeasonalOrders AS (
+    SELECT CUSTOMER_ID, 
+           EXTRACT(MONTH FROM ORDER_DATE) AS ORDER_MONTH, 
+           SUM(ORDER_AMOUNT) AS TOTAL_ORDER_AMOUNT
+    FROM Orders
+    GROUP BY CUSTOMER_ID, EXTRACT(MONTH FROM ORDER_DATE)
+)
+SELECT C.CUSTOMER_NAME, SUM(S.TOTAL_ORDER_AMOUNT) AS TOTAL_SEASONAL_AMOUNT
+FROM Customers C
+JOIN SeasonalOrders S ON C.CUSTOMER_ID = S.CUSTOMER_ID
+WHERE S.ORDER_MONTH IN (12)  -- December as an example of a season
+GROUP BY C.CUSTOMER_NAME
+HAVING SUM(S.TOTAL_ORDER_AMOUNT) > (SELECT AVG(TOTAL_ORDER
+
+_AMOUNT) FROM SeasonalOrders WHERE ORDER_MONTH IN (12));
+```
+
+---
+
+### 37. Identify customers who have made repeat purchases of the same product multiple times and display their total spending on those products.
+```sql
+WITH RepeatPurchases AS (
+    SELECT CUSTOMER_ID, PRODUCT_ID, 
+           COUNT(ORDER_ID) AS PURCHASE_COUNT, 
+           SUM(ORDER_AMOUNT) AS TOTAL_SPENDING
+    FROM Orders
+    GROUP BY CUSTOMER_ID, PRODUCT_ID
+    HAVING COUNT(ORDER_ID) > 1
+)
+SELECT C.CUSTOMER_NAME, RP.PRODUCT_ID, RP.TOTAL_SPENDING
+FROM Customers C
+JOIN RepeatPurchases RP ON C.CUSTOMER_ID = RP.CUSTOMER_ID;
+```
+
+---
+
+### 38. Find customers whose average order value increases significantly (by 25% or more) after a specific marketing campaign and show their total orders.
+```sql
+WITH PreCampaign AS (
+    SELECT CUSTOMER_ID, AVG(ORDER_AMOUNT) AS AVG_BEFORE
+    FROM Orders
+    WHERE ORDER_DATE < TO_DATE('01-JAN-2024', 'DD-MON-YYYY')  -- Adjust to campaign start date
+    GROUP BY CUSTOMER_ID
+),
+PostCampaign AS (
+    SELECT CUSTOMER_ID, AVG(ORDER_AMOUNT) AS AVG_AFTER
+    FROM Orders
+    WHERE ORDER_DATE >= TO_DATE('01-JAN-2024', 'DD-MON-YYYY')  -- Adjust to campaign start date
+    GROUP BY CUSTOMER_ID
+)
+SELECT C.CUSTOMER_NAME, P.AVG_BEFORE, P.AVG_AFTER, COUNT(O.ORDER_ID) AS TOTAL_ORDERS
+FROM Customers C
+JOIN PreCampaign P ON C.CUSTOMER_ID = P.CUSTOMER_ID
+JOIN PostCampaign A ON C.CUSTOMER_ID = A.CUSTOMER_ID
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+WHERE (A.AVG_AFTER - P.AVG_BEFORE) / P.AVG_BEFORE >= 0.25;  -- 25% increase
+GROUP BY C.CUSTOMER_NAME, P.AVG_BEFORE, A.AVG_AFTER;
+```
+
+---
+
+### 39. List customers who have placed orders that match the mode of their previous order amounts and display their total orders.
+```sql
+WITH PreviousOrders AS (
+    SELECT CUSTOMER_ID, 
+           ORDER_AMOUNT,
+           LAG(ORDER_AMOUNT) OVER (PARTITION BY CUSTOMER_ID ORDER BY ORDER_DATE) AS PREV_ORDER_AMOUNT
+    FROM Orders
+),
+ModeOrders AS (
+    SELECT CUSTOMER_ID, ORDER_AMOUNT AS MODE_AMOUNT
+    FROM PreviousOrders
+    GROUP BY CUSTOMER_ID, ORDER_AMOUNT
+    HAVING COUNT(*) = (SELECT MAX(COUNT(*)) 
+                       FROM PreviousOrders 
+                       WHERE CUSTOMER_ID = PreviousOrders.CUSTOMER_ID
+                       GROUP BY ORDER_AMOUNT)
+)
+SELECT C.CUSTOMER_NAME, COUNT(O.ORDER_ID) AS TOTAL_ORDERS
+FROM Customers C
+JOIN ModeOrders M ON C.CUSTOMER_ID = M.CUSTOMER_ID
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+WHERE O.ORDER_AMOUNT = M.MODE_AMOUNT
+GROUP BY C.CUSTOMER_NAME;
+```
+
+---
+
+### 40. Retrieve customers who have maintained an average order amount within a specific range (e.g., 1000 to 2000) over a long period and show their total orders.
+```sql
+WITH CustomerStats AS (
+    SELECT CUSTOMER_ID, AVG(ORDER_AMOUNT) AS AVG_ORDER_AMOUNT
+    FROM Orders
+    GROUP BY CUSTOMER_ID
+)
+SELECT C.CUSTOMER_NAME, COUNT(O.ORDER_ID) AS TOTAL_ORDERS
+FROM Customers C
+JOIN CustomerStats S ON C.CUSTOMER_ID = S.CUSTOMER_ID
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+WHERE S.AVG_ORDER_AMOUNT BETWEEN 1000 AND 2000
+GROUP BY C.CUSTOMER_NAME;
+```
+
+---
+
+### 41. Identify customers who place the highest number of orders during a promotional period and display their total order amounts for that period.
+```sql
+WITH PromotionalOrders AS (
+    SELECT CUSTOMER_ID, 
+           COUNT(ORDER_ID) AS ORDER_COUNT, 
+           SUM(ORDER_AMOUNT) AS TOTAL_ORDER_AMOUNT
+    FROM Orders
+    WHERE ORDER_DATE >= TO_DATE('01-JUN-2024', 'DD-MON-YYYY') AND ORDER_DATE <= TO_DATE('30-JUN-2024', 'DD-MON-YYYY')  -- Promotional period
+    GROUP BY CUSTOMER_ID
+)
+SELECT C.CUSTOMER_NAME, P.ORDER_COUNT, P.TOTAL_ORDER_AMOUNT
+FROM Customers C
+JOIN PromotionalOrders P ON C.CUSTOMER_ID = P.CUSTOMER_ID
+ORDER BY P.ORDER_COUNT DESC
+FETCH FIRST 1 ROW ONLY;  -- Top customer during promotional period
+```
+
+---
+
+### 42. Find customers who have placed orders with a total amount exceeding the combined amounts of their last three orders and show their total orders.
+```sql
+WITH LastThreeOrders AS (
+    SELECT CUSTOMER_ID, 
+           ORDER_AMOUNT,
+           ROW_NUMBER() OVER (PARTITION BY CUSTOMER_ID ORDER BY ORDER_DATE DESC) AS ORDER_RANK
+    FROM Orders
+),
+CombinedLastThree AS (
+    SELECT CUSTOMER_ID, SUM(ORDER_AMOUNT) AS LAST_THREE_TOTAL
+    FROM LastThreeOrders
+    WHERE ORDER_RANK <= 3
+    GROUP BY CUSTOMER_ID
+)
+SELECT C.CUSTOMER_NAME, COUNT(O.ORDER_ID) AS TOTAL_ORDERS
+FROM Customers C
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+JOIN CombinedLastThree L ON C.CUSTOMER_ID = L.CUSTOMER_ID
+WHERE O.ORDER_AMOUNT > L.LAST_THREE_TOTAL
+GROUP BY C.CUSTOMER_NAME;
+```
+
+---
+
+### 43. Show customers whose order history shows a pattern of decreasing frequency but increasing average order value over time.
+```sql
+WITH OrderFrequency AS (
+    SELECT CUSTOMER_ID, 
+           EXTRACT(YEAR FROM ORDER_DATE) AS ORDER_YEAR,
+           COUNT(ORDER_ID) AS ORDER_COUNT,
+           AVG(ORDER_AMOUNT) AS AVG_ORDER_AMOUNT
+    FROM Orders
+    GROUP BY CUSTOMER_ID, EXTRACT(YEAR FROM ORDER_DATE)
+),
+FrequencyTrend AS (
+    SELECT CUSTOMER_ID,
+           LAG(ORDER_COUNT) OVER (PARTITION BY CUSTOMER_ID ORDER BY ORDER_YEAR) AS PREV_ORDER_COUNT,
+           AVG_ORDER_AMOUNT
+    FROM OrderFrequency
+)
+SELECT C.CUSTOMER_NAME
+FROM Customers C
+JOIN FrequencyTrend F ON C.CUSTOMER_ID = F.CUSTOMER_ID
+WHERE F.ORDER_COUNT < F.PREV_ORDER_COUNT AND F.AVG_ORDER_AMOUNT > LAG(F.AVG_ORDER_AMOUNT) OVER (PARTITION BY F.CUSTOMER_ID ORDER BY F.ORDER_YEAR);
+```
+
+---
+
+### 44. Retrieve customers who placed orders that exactly match the average order amount of all customers and display their total orders.
+```sql
+WITH AverageOrder AS (
+    SELECT AVG(ORDER_AMOUNT) AS AVG_ORDER_AMOUNT
+    FROM Orders
+),
+MatchingOrders AS (
+    SELECT CUSTOMER_ID, COUNT(ORDER_ID) AS TOTAL_ORDERS
+    FROM Orders
+    WHERE ORDER_AMOUNT = (SELECT AVG_ORDER_AMOUNT FROM AverageOrder)
+    GROUP BY CUSTOMER_ID
+)
+SELECT C.CUSTOMER_NAME, M.TOTAL_ORDERS
+FROM Customers C
+JOIN MatchingOrders M ON C.CUSTOMER_ID = M.CUSTOMER_ID;
+```
+
+---
+
+### 45. List customers who have an average order amount that is consistently higher than the average of their segment and display their total orders.
+```sql
+WITH SegmentStats AS (
+    SELECT SEGMENT_ID, AVG(ORDER_AMOUNT) AS SEGMENT_AVG
+    FROM Customers C
+    JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+    GROUP BY SEGMENT_ID
+),
+CustomerStats AS (
+    SELECT CUSTOMER_ID, AVG(ORDER_AMOUNT) AS AVG_ORDER_AMOUNT, SEGMENT_ID
+    FROM Customers C
+    JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+    GROUP BY CUSTOMER_ID, SEGMENT_ID
+)
+SELECT C.CUSTOMER_NAME, COUNT(O.ORDER_ID) AS TOTAL_ORDERS
+FROM Customers C
+JOIN CustomerStats S ON C.CUSTOMER_ID = S.CUSTOMER_ID
+JOIN SegmentStats G ON S.SEGMENT_ID = G.SEGMENT_ID
+JOIN Orders O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+WHERE S.AVG_ORDER_AMOUNT > G.SEGMENT_AVG
+GROUP BY C.CUSTOMER_NAME;
+```
+
+---
+
+
