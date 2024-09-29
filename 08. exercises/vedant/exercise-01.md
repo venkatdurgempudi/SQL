@@ -1,4 +1,5 @@
-Below is DDL & DML for the `CUSTOMERS` and `ORDERS` tables. 
+Below is DDL & DML for the `CUSTOMERS` and `ORDERS` tables.  
+
 The questions combine various subtopics like single-row functions, aggregate functions, joins, and other operations.
 
 ---
