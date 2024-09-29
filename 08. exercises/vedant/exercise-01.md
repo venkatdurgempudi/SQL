@@ -1,8 +1,15 @@
-Below is DDL & DML for the `CUSTOMERS` and `ORDERS` tables.  
-
+# **50 SQL Questions**  
 The questions combine various subtopics like single-row functions, aggregate functions, joins, and other operations.
 
----
+
+<br>  
+
+<br>  
+
+  
+## Below is DDL & DML for the `CUSTOMERS` and `ORDERS` tables.  
+
+
 
 ### **DDL for `CUSTOMERS` Table**
 
@@ -29,7 +36,6 @@ CREATE TABLE ORDERS (
 );
 ```
 
----
 
 ### **Complete Dataset (DML for `CUSTOMERS` Table - 200 rows)**
 
@@ -65,7 +71,6 @@ END;
 /
 ```
 
----
 
 ### **Complete Dataset (DML for `ORDERS` Table - 200 rows)**
 
@@ -98,11 +103,13 @@ END;
 /
 ```
 
----
 
-### **50 Realistic and Moderately to Highly Difficult SQL Questions**
+<br>  
+<br>  
 
----
+
+## Assignment  
+
 
 **1.** Retrieve the total amount spent by each customer, their first name, and city.  
 **2.** Find customers who placed an order after January 1, 2021, and calculate the average amount spent per order.  
