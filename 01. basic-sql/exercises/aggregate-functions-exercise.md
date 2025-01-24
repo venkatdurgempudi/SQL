@@ -1,3 +1,8 @@
+# Assignment: SQL Aggregate Functions  
+
+<details>
+  <summary>Click here for DDL and DML of target data set</summary>
+
 ```sql
 -- Create the SALES table
 CREATE TABLE SALES (
@@ -82,7 +87,13 @@ INSERT INTO SALES VALUES (122, 4, 'Headphones', 'Chris Evans', TO_DATE('22-FEB-2
 Commit;
 ```
 
-### Assignment: SQL Aggregate Functions  
+</details>
+
+
+
+## `Questions`
+
+
 
 **1.** Find the total number of products sold across all transactions.  
 
