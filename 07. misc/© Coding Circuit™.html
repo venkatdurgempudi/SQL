@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>© Coding Circuit™.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="sql-plsql-developer-course-outline-oracle"><strong>SQL PLSQL Developer Course Outline (Oracle)</strong></h1>
+<br>  
+<br>  
+<h2 id="span-style%22colorcoral%22-1-basic-sqlspan-span-style%22colorcoral%22-16-classesspan"><strong><span style="color:coral;"> 1. Basic SQL</span></strong>                                                                               <strong><span style="color:coral;"> 16 classes</span></strong></h2>
+<ol>
+<li>
+<p><strong>Oracle 11g Database Configuration</strong>  – <strong><span style="color:coral;"> 1 class</span></strong></p>
+<ul>
+<li>Installing Oracle 11g</li>
+<li>Configuring Oracle Users and Roles</li>
+<li>Configuring the Sample Database</li>
+</ul>
+</li>
+<li>
+<p><strong>RDBMS and SQL</strong> –  <strong><span style="color:coral;"> 1 class</span></strong></p>
+<ul>
+<li>Database Management System (DBMS)</li>
+<li>Relational Database Management System (RDBMS)</li>
+<li>Structured Query Language (SQL)</li>
+</ul>
+</li>
+<li>
+<p><strong>Data Types and Constraints</strong> – <strong><span style="color:coral;"> 2 classes</span></strong></p>
+<ul>
+<li>Oracle Data Types (CHAR, VARCHAR2, NUMBER, DATE, BLOB)</li>
+<li>Implicit and Explicit Data Type Conversion</li>
+<li>Types of Constraints (NOT NULL, UNIQUE, PRIMARY KEY, FOREIGN KEY, CHECK)</li>
+<li>Defining and Modifying Constraints</li>
+</ul>
+</li>
+<li>
+<p><strong>DDL (Data Definition Language)</strong>  – <strong><span style="color:coral;"> 1 class</span></strong></p>
+<ul>
+<li>CREATE</li>
+<li>ALTER</li>
+<li>DROP</li>
+<li>RENAME</li>
+<li>TRUNCATE</li>
+</ul>
+</li>
+<li>
+<p><strong>DML (Data Manipulation Language)</strong>  – <strong><span style="color:coral;"> 1 class</span></strong></p>
+<ul>
+<li>INSERT</li>
+<li>UPDATE</li>
+<li>DELETE</li>
+</ul>
+</li>
+<li>
+<p><strong>TCL (Transaction Control Language)</strong>  – <strong><span style="color:coral;"> 1 class</span></strong></p>
+<ul>
+<li>COMMIT</li>
+<li>ROLLBAC</li>
+<li>SAVEPOINT</li>
+</ul>
+</li>
+<li>
+<p><strong>DRL (Data Retrieval Language) - SELECT</strong>  – <strong><span style="color:coral;"> 2 classes</span></strong></p>
+<ul>
+<li>Basic SELECT Query</li>
+<li>Using WHERE Clause</li>
+<li>Sorting Results with ORDER BY</li>
+<li>Filtering Data with DISTINCT</li>
+<li>Limiting Results with ROWNUM and FETCH</li>
+</ul>
+</li>
+<li>
+<p><strong>Single Row Functions</strong>  – <strong><span style="color:coral;"> 4 classes</span></strong></p>
+<ul>
+<li>String Functions (e.g., CONCAT, LENGTH, SUBSTR, INSTR)</li>
+<li>Numeric Functions (e.g., ROUND, CEIL, FLOOR, MOD)</li>
+<li>Date Functions (e.g., SYSDATE, ADD_MONTHS, TO_DATE)</li>
+<li>Conversion Functions (e.g., TO_CHAR, TO_NUMBER, TO_DATE)</li>
+<li>NULL-related Functions (e.g., NVL, COALESCE, NULLIF)</li>
+</ul>
+</li>
+<li>
+<p><strong>Aggregate Functions</strong>  – <strong><span style="color:coral;"> 1 class</span></strong></p>
+<ul>
+<li>COUNT</li>
+<li>SUM</li>
+<li>AVG</li>
+<li>MAX</li>
+<li>MIN</li>
+<li>Using GROUP BY and HAVING with Aggregate Functions</li>
+</ul>
+</li>
+<li>
+<p><strong>Joins</strong>  – <strong><span style="color:coral;"> 2 classes</span></strong></p>
+<ul>
+<li>INNER JOIN</li>
+<li>OUTER JOIN (LEFT, RIGHT, FULL)</li>
+<li>CROSS JOIN</li>
+<li>SELF JOIN</li>
+</ul>
+</li>
+</ol>
+<br>   
+<h2 id="span-style%22colorcoral%22-2-advanced-sqlspan-span-style%22colorcoral%22-14-classesspan"><strong><span style="color:coral;"> 2. Advanced SQL</span></strong>                                                                            <strong><span style="color:coral;"> 14 classes</span></strong></h2>
+<ol>
+<li>
+<p><strong>Pseudo Column</strong> – <strong><span style="color:coral;"> 1 class</span></strong></p>
+<ul>
+<li>ROWNUM</li>
+<li>ROWID</li>
+<li>SYSDATE</li>
+<li>LEVEL</li>
+<li>CURRVAL and NEXTVAL (for Sequences)</li>
+</ul>
+</li>
+<li>
+<p><strong>Advanced DML</strong>  – <strong><span style="color:coral;"> 2 classes</span></strong></p>
+<ul>
+<li>INSERT ALL</li>
+<li>UPDATE ALL</li>
+<li>MERGE (Upsert Operation)</li>
+<li>UPDATE with JOIN</li>
+<li>DELETE with JOIN</li>
+</ul>
+</li>
+<li>
+<p><strong>Subqueries</strong>  – <strong><span style="color:coral;"> 3 classes</span></strong></p>
+<ul>
+<li>Single-row Subquery</li>
+<li>Multiple-row Subquery</li>
+<li>Correlated Subquery</li>
+<li>Nested Subquery</li>
+<li>Subquery in SELECT, WHERE, and FROM clauses</li>
+</ul>
+</li>
+<li>
+<p><strong>SET Operators</strong>  – <strong><span style="color:coral;"> 1 class</span></strong></p>
+<ul>
+<li>UNION</li>
+<li>UNION ALL</li>
+<li>INTERSECT</li>
+<li>MINUS</li>
+<li>Differences between UNION and UNION ALL</li>
+</ul>
+</li>
+<li>
+<p><strong>Analytical (Window) Functions</strong>  – <strong><span style="color:coral;"> 2 classes</span></strong></p>
+<ul>
+<li>ROW_NUMBER()</li>
+<li>RANK()</li>
+<li>DENSE_RANK()</li>
+<li>NTILE()</li>
+<li>LEAD() and LAG()</li>
+<li>FIRST_VALUE() and LAST_VALUE()</li>
+<li>PERCENT_RANK()</li>
+</ul>
+</li>
+<li>
+<p><strong>Conditional Statements</strong>  – <strong><span style="color:coral;"> 1 class</span></strong></p>
+<ul>
+<li>CASE Statement</li>
+<li>DECODE Function</li>
+<li>NVL (as a conditional function)</li>
+</ul>
+</li>
+<li>
+<p><strong>Views</strong>  – <strong><span style="color:coral;"> 2 class</span></strong></p>
+<ul>
+<li>Creating Views</li>
+<li>Updating Views</li>
+<li>Dropping Views</li>
+<li>Materialized Views</li>
+<li>Advantages and Limitations of Views</li>
+</ul>
+</li>
+<li>
+<p><strong>Sequences</strong>  – <strong><span style="color:coral;"> 1 class</span></strong></p>
+<ul>
+<li>Creating Sequences</li>
+<li>Using Sequences with NEXTVAL and CURRVAL</li>
+<li>Alter and Drop Sequences</li>
+</ul>
+</li>
+<li>
+<p><strong>Synonyms</strong>  – <strong><span style="color:coral;"> 1 class</span></strong></p>
+<ul>
+<li>Creating Synonyms</li>
+<li>Using Public and Private Synonyms</li>
+<li>Dropping Synonyms</li>
+<li>Advantages of Synonyms in SQL Queries</li>
+</ul>
+</li>
+</ol>
+<br>  
+<h2 id="span-style%22colorcoral%22-3-plsqlspan-span-style%22colorcoral%22-34-classesspan"><strong><span style="color:coral;"> 3. PLSQL</span></strong>                                                                                          <strong><span style="color:coral;"> 34 classes</span></strong></h2>
+<ol>
+<li>
+<p><strong>Getting Started with PL/SQL</strong>  – <strong><span style="color:coral;"> 1 class</span></strong></p>
+<ul>
+<li>Introduction to PL/SQL</li>
+<li>PL/SQL Block Structure (DECLARE, BEGIN, EXCEPTION, END)</li>
+<li>PL/SQL vs SQL</li>
+<li>Writing and Executing Simple PL/SQL Programs</li>
+</ul>
+</li>
+<li>
+<p><strong>Flow Control (Conditional Statements)</strong>  – <strong><span style="color:coral;"> 1 class</span></strong></p>
+<ul>
+<li>IF-THEN-ELSE</li>
+<li>CASE</li>
+<li>GOTO</li>
+<li>NULL</li>
+</ul>
+</li>
+<li>
+<p><strong>Flow Control (Iterative Statements)</strong>  – <strong><span style="color:coral;"> 1 class</span></strong></p>
+<ul>
+<li>LOOP</li>
+<li>WHILE LOOP</li>
+<li>FOR LOOP</li>
+<li>EXIT and CONTINUE Statements</li>
+</ul>
+</li>
+<li>
+<p><strong>SELECT INTO</strong>  – <strong><span style="color:coral;"> 1 class</span></strong></p>
+<ul>
+<li>Using SELECT INTO for Variable Assignment</li>
+<li>Selecting into Record Variables</li>
+<li>Handling Multiple Rows with SELECT INTO</li>
+<li>Common Errors with SELECT INTO</li>
+</ul>
+</li>
+<li>
+<p><strong>Exceptions</strong>  – <strong><span style="color:coral;"> 2 classes</span></strong></p>
+<ul>
+<li>Predefined Exceptions</li>
+<li>User-defined Exceptions</li>
+<li>EXCEPTION_INIT</li>
+<li>Handling Exceptions with RAISE and RAISE_APPLICATION_ERROR</li>
+<li>Exception Propagation</li>
+</ul>
+</li>
+<li>
+<p><strong>Cursors</strong>  – <strong><span style="color:coral;"> 2 classes</span></strong></p>
+<ul>
+<li>Implicit Cursors</li>
+<li>Explicit Cursors</li>
+<li>Cursor FOR Loops</li>
+<li>Cursor Variables</li>
+<li>Handling Cursor Exceptions</li>
+</ul>
+</li>
+<li>
+<p><strong>Records</strong>  – <strong><span style="color:coral;"> 2 classes</span></strong></p>
+<ul>
+<li>Declaring a Record Type</li>
+<li>Using Records with SELECT INTO</li>
+<li>%ROWTYPE vs %TYPE</li>
+<li>Manipulating Record Values</li>
+</ul>
+</li>
+<li>
+<p><strong>Procedures</strong>  – <strong><span style="color:coral;"> 3 classes</span></strong></p>
+<ul>
+<li>Creating and Calling Procedures</li>
+<li>IN, OUT, and INOUT Parameters</li>
+<li>Procedure Overloading</li>
+<li>Handling Exceptions in Procedures</li>
+<li>Dropping and Altering Procedures</li>
+</ul>
+</li>
+<li>
+<p><strong>Functions</strong>  – <strong><span style="color:coral;"> 2 classes</span></strong></p>
+<ul>
+<li>Creating and Calling Functions</li>
+<li>IN and OUT Parameters in Functions</li>
+<li>Function Overloading</li>
+<li>Returning Values from Functions</li>
+<li>Dropping and Altering Functions</li>
+<li>Procuedure vs Functions</li>
+</ul>
+</li>
+<li>
+<p><strong>Packages</strong>  – <strong><span style="color:coral;"> 3 classes</span></strong></p>
+<ul>
+<li>Creating and Using Packages</li>
+<li>Package Specification vs Package Body</li>
+<li>Public and Private Procedures/Functions</li>
+<li>Package Initialization</li>
+<li>Package State (Global Variables)</li>
+<li>Advantages of Packages over Procedures and Functions</li>
+</ul>
+</li>
+<li>
+<p><strong>Triggers</strong>  – <strong><span style="color:coral;"> 2 classes</span></strong></p>
+<ul>
+<li>Creating Triggers</li>
+<li>Types of Triggers (BEFORE, AFTER, INSTEAD OF)</li>
+<li>INSTEAD OF Triggers</li>
+<li>Row-Level vs Statement-Level Triggers</li>
+<li>Compound Triggers</li>
+<li>Trigger Timing and Order</li>
+<li>Disabling and Dropping Triggers</li>
+</ul>
+</li>
+<li>
+<p><strong>Collections</strong>  – <strong><span style="color:coral;"> 3 classes</span></strong></p>
+<ul>
+<li>Types of Collections (Associative Arrays, Nested Tables, VARRAYs)</li>
+<li>Creating and Using Collections</li>
+<li>Manipulating Collection Data</li>
+<li>Collection Methods (COUNT, EXISTS, FIRST, LAST)</li>
+</ul>
+</li>
+<li>
+<p><strong>Bulk Collect</strong>  – <strong><span style="color:coral;"> 2 classes</span></strong></p>
+<ul>
+<li>Using BULK COLLECT to Fetch Data into Collections</li>
+<li>LIMIT Clause in BULK COLLECT</li>
+<li>Performance Benefits of BULK COLLECT</li>
+<li>Handling Exceptions with BULK COLLECT</li>
+<li>Fetching Multiple Collections in One Query</li>
+<li>Using FORALL with BULK COLLECT for Efficient DML Operations</li>
+</ul>
+</li>
+<li>
+<p><strong>Dynamic SQL</strong>  – <strong><span style="color:coral;"> 2 classes</span></strong></p>
+<ul>
+<li>Introduction to Dynamic SQL</li>
+<li>EXECUTE IMMEDIATE</li>
+<li>Using Bind Variables with Dynamic SQL</li>
+<li>Building Dynamic SQL for DML and DDL</li>
+<li>Executing Dynamic SQL with RETURNING INTO</li>
+</ul>
+</li>
+<li>
+<p><strong>Table Functions</strong>  – <strong><span style="color:coral;"> 2 classes</span></strong></p>
+<ul>
+<li>Creating and Using Table Functions</li>
+<li>Returning a Table from a Function</li>
+<li>Using Table Functions in SQL Queries</li>
+</ul>
+</li>
+<li>
+<p><strong>Objects</strong> – <strong><span style="color:coral;"> 2 classes</span></strong></p>
+<ul>
+<li>Creating and Using Object Types</li>
+<li>Methods in Object Types</li>
+<li>Using Objects in Tables (Object-Relational Features)</li>
+<li>Managing Object Type Dependencies</li>
+</ul>
+</li>
+<li>
+<p><strong>Database Links</strong> – <strong><span style="color:coral;"> 1 class</span></strong></p>
+<ul>
+<li>Creating Database Links</li>
+<li>Using Database Links in Queries</li>
+<li>Managing Database Links</li>
+<li>Performance Considerations</li>
+</ul>
+</li>
+<li>
+<p><strong>Autonomous Transactions</strong> – <strong><span style="color:coral;"> 2 classes</span></strong></p>
+<ul>
+<li>Using PRAGMA AUTONOMOUS_TRANSACTION</li>
+<li>When to Use Autonomous Transactions</li>
+<li>COMMIT and ROLLBACK Inside Autonomous Transactions</li>
+<li>Performance Considerations</li>
+</ul>
+</li>
+</ol>
+<br>  
+<h2 id="span-style%22colorcoral%22-4-performance-tuningspan-span-style%22colorcoral%22-16-classesspan"><strong><span style="color:coral;"> 4. Performance Tuning</span></strong>                                                                <strong><span style="color:coral;"> 16 classes</span></strong></h2>
+<ol>
+<li>
+<p><strong>Read an Execution Plan</strong> – <strong><span style="color:coral;"> 2 class</span></strong></p>
+<ul>
+<li>Understanding the Execution Plan</li>
+<li>How to Generate an Execution Plan</li>
+<li>Interpreting Execution Plan Outputs</li>
+<li>Using EXPLAIN PLAN</li>
+</ul>
+</li>
+<li>
+<p><strong>Database Statistics</strong> – <strong><span style="color:coral;"> 2 class</span></strong></p>
+<ul>
+<li>Collecting Database Statistics</li>
+<li>Viewing and Interpreting Statistics</li>
+<li>Using DBMS_STATS</li>
+<li>Automatic vs Manual Statistics Collection</li>
+<li>Analyzing and Tuning Based on Statistics</li>
+</ul>
+</li>
+<li>
+<p><strong>Query Performance</strong> – <strong><span style="color:coral;"> 2 class</span></strong></p>
+<ul>
+<li>Identifying Slow Queries</li>
+<li>Optimizing Query Execution</li>
+<li>Using Hints for Query Optimization</li>
+<li>Common Query Performance Pitfalls</li>
+<li>Analyzing Query Performance with EXPLAIN PLAN</li>
+</ul>
+</li>
+<li>
+<p><strong>Create Indexes</strong> – <strong><span style="color:coral;"> 1 class</span></strong></p>
+<ul>
+<li>Types of Indexes (B-tree, Bitmap, Clustered, etc.)</li>
+<li>Creating Indexes in Oracle</li>
+<li>Using Indexes to Improve Query Performance</li>
+<li>Index Maintenance (Rebuilding, Dropping)</li>
+<li>When Not to Use Indexes</li>
+</ul>
+</li>
+<li>
+<p><strong>Why My Query Not Using an Index</strong> – <strong><span style="color:coral;"> 1 class</span></strong></p>
+<ul>
+<li>Reasons Queries Don’t Use Indexes</li>
+<li>Optimizer Hints to Force Index Usage</li>
+<li>Index Selectivity and Cardinality</li>
+<li>Using EXPLAIN PLAN to Diagnose Index Usage</li>
+<li>Resolving Common Indexing Issues</li>
+</ul>
+</li>
+<li>
+<p><strong>Summarize Data Fast with Materialized Views</strong> – <strong><span style="color:coral;"> 2 classes</span></strong></p>
+<ul>
+<li>Creating Materialized Views</li>
+<li>Refreshing Materialized Views (On-demand, Periodically)</li>
+<li>Materialized View Logs</li>
+<li>Performance Benefits of Materialized Views</li>
+<li>When to Use Materialized Views</li>
+</ul>
+</li>
+<li>
+<p><strong>Joins</strong>  – <strong><span style="color:coral;"> 1 class</span></strong></p>
+<ul>
+<li>Hash Joins</li>
+<li>Nested Loops Joins</li>
+<li>Merge Joins</li>
+<li>Join Algorithms and Their Performance</li>
+<li>Choosing the Right Join for Performance</li>
+</ul>
+</li>
+<li>
+<p><strong>Make Inserts, Updates, and Deletes Faster</strong> – <strong><span style="color:coral;"> 2 classes</span></strong></p>
+<ul>
+<li>Optimizing INSERT Performance</li>
+<li>Batch Processing for Bulk Inserts</li>
+<li>Optimizing UPDATE and DELETE Queries</li>
+<li>Using Direct Path Inserts</li>
+<li>Avoiding Locking Issues during DML Operations</li>
+</ul>
+</li>
+<li>
+<p><strong>Find Slow SQL</strong> – <strong><span style="color:coral;"> 2 classes</span></strong></p>
+<ul>
+<li>Identifying Slow SQL Queries</li>
+<li>Using AWR and ASH Reports for Performance Tuning</li>
+<li>SQL Trace and TKPROF</li>
+<li>Using Oracle Enterprise Manager (OEM) to Find Slow SQL</li>
+<li>Optimizing Slow Queries</li>
+</ul>
+</li>
+<li>
+<p><strong>Further Reading</strong> – <strong><span style="color:coral;"> 1 class</span></strong></p>
+<ul>
+<li>Books and Resources for SQL and PL/SQL Tuning</li>
+<li>Oracle Documentation for Advanced Features</li>
+<li>Best Practices for SQL Performance</li>
+<li>Websites and Communities for Oracle Performance Tuning</li>
+</ul>
+</li>
+</ol>
+<br>  
+<br>  
+<br>  
+<h2 id="span-style%22colorblue%22%F0%9F%93%8C-course-feespan"><strong><span style="color:blue;">📌 Course Fee</span></strong></h2>
+<br>   
+<table>
+<thead>
+<tr>
+<th>Course Name</th>
+<th>Topics Covered</th>
+<th>Fee</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SQL only</td>
+<td>Basic SQL, Advanced SQL - <strong><code>30 classes</code></strong></td>
+<td><strong>₹20,000</strong></td>
+</tr>
+<tr>
+<td>SQL + PLSQL</td>
+<td>Basic SQL, Advanced SQL, PL/SQL - <strong><code>64 classes</code></strong></td>
+<td><strong>₹35,000</strong></td>
+</tr>
+<tr>
+<td>SQL + PLSQL + Perf Tuning</td>
+<td>Basic SQL, Advanced SQL, PL/SQL, Performance Tuning  - <strong><code>80 classes</code></strong></td>
+<td><strong>₹40,000</strong></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<br>  
+<br>  
+<br>  
+<h2 id="span-style%22colorblue%22%E2%9C%85-includedspan"><strong><span style="color:blue;">✅ Included</span></strong></h2>
+<ul>
+<li>One-to-One Sessions</li>
+<li>Live Session Recording</li>
+<li>Project-Specific Assignments</li>
+<li>GitHub Training Material Access</li>
+</ul>
+
+</body>
+</html>
