@@ -1,0 +1,287 @@
+## **SQL PLSQL Developer Course Outline (Oracle)**
+
+---
+
+### **1. Basic SQL** *(15 Hours)*
+
+1. **Oracle 11g Database Configuration**
+   - Installing Oracle 11g  
+   - Configuring Oracle Users and Roles  
+   - Configuring the Sample Database  
+
+2. **RDBMS and SQL**
+   - Database Management System (DBMS)  
+   - Relational Database Management System (RDBMS)  
+   - Structured Query Language (SQL)  
+
+3. **Data Types and Constraints**
+   - Oracle Data Types (CHAR, VARCHAR2, NUMBER, DATE, BLOB)  
+   - Implicit and Explicit Data Type Conversion  
+   - Types of Constraints (NOT NULL, UNIQUE, PRIMARY KEY, FOREIGN KEY, CHECK)  
+   - Defining and Modifying Constraints  
+
+4. **DDL (Data Definition Language)**  
+   - CREATE  
+   - ALTER  
+   - DROP  
+   - RENAME  
+   - TRUNCATE  
+
+5. **DML (Data Manipulation Language)**  
+   - INSERT
+   - UPDATE
+   - DELETE  
+
+6. **TCL (Transaction Control Language)**  
+   - COMMIT
+   - ROLLBAC
+   - SAVEPOINT  
+
+7. **DRL (Data Retrieval Language) - SELECT**  
+   - Basic SELECT Query
+   - Using WHERE Clause
+   - Sorting Results with ORDER BY
+   - Filtering Data with DISTINCT
+   - Limiting Results with ROWNUM and FETCH
+
+8. **Single Row Functions**  
+   - String Functions (e.g., CONCAT, LENGTH, SUBSTR, INSTR)
+   - Numeric Functions (e.g., ROUND, CEIL, FLOOR, MOD)
+   - Date Functions (e.g., SYSDATE, ADD_MONTHS, TO_DATE)
+   - Conversion Functions (e.g., TO_CHAR, TO_NUMBER, TO_DATE)
+   - NULL-related Functions (e.g., NVL, COALESCE, NULLIF) 
+
+9. **Aggregate Functions**  
+   - COUNT
+   - SUM
+   - AVG
+   - MAX
+   - MIN
+   - Using GROUP BY and HAVING with Aggregate Functions  
+
+10. **Joins**  
+    - INNER JOIN  
+    - OUTER JOIN (LEFT, RIGHT, FULL)  
+    - CROSS JOIN  
+    - SELF JOIN 
+
+---
+
+
+
+### **2. Advanced SQL** *(15 Hours)*
+
+1. **Pseudo Column**
+    - ROWNUM  
+    - ROWID  
+    - SYSDATE  
+    - LEVEL  
+    - CURRVAL and NEXTVAL (for Sequences)  
+      
+2. **Advanced DML**  
+   - INSERT ALL
+   - UPDATE ALL
+   - MERGE (Upsert Operation)
+   - UPDATE with JOIN
+   - DELETE with JOIN
+  
+
+3. **Subqueries**  
+    - Single-row Subquery  
+    - Multiple-row Subquery  
+    - Correlated Subquery  
+    - Nested Subquery  
+    - Subquery in SELECT, WHERE, and FROM clauses  
+ 
+4. **SET Operators**  
+    - UNION  
+    - UNION ALL  
+    - INTERSECT  
+    - MINUS  
+    - Differences between UNION and UNION ALL  
+
+5. **Analytical (Window) Functions**  
+    - ROW_NUMBER()  
+    - RANK()  
+    - DENSE_RANK()  
+    - NTILE()  
+    - LEAD() and LAG()  
+    - FIRST_VALUE() and LAST_VALUE()  
+    - PERCENT_RANK()  
+
+6. **Conditional Statements**  
+    - CASE Statement  
+    - DECODE Function  
+    - NVL (as a conditional function)  
+
+7. **Views**  
+    - Creating Views  
+    - Updating Views  
+    - Dropping Views  
+    - Materialized Views  
+    - Advantages and Limitations of Views  
+
+ 
+8. **Sequences**  
+    - Creating Sequences  
+    - Using Sequences with NEXTVAL and CURRVAL  
+    - Alter and Drop Sequences
+ 
+9. **Synonyms**  
+    - Creating Synonyms  
+    - Using Public and Private Synonyms  
+    - Dropping Synonyms  
+    - Advantages of Synonyms in SQL Queries  
+
+
+---
+
+### **3. PL/SQL** *(25 Hours)*
+
+1. **Getting Started with PL/SQL**  
+   - Introduction to PL/SQL  
+   - PL/SQL Block Structure (DECLARE, BEGIN, EXCEPTION, END)  
+   - PL/SQL vs SQL  
+   - Writing and Executing Simple PL/SQL Programs  
+
+2. **Flow Control (Conditional Statements)**  
+   - IF-THEN-ELSE  
+   - CASE  
+   - DECODE  
+   - NULLIF  
+   - GOTO  
+
+3. **Flow Control (Iterative Statements)**  
+   - LOOP  
+   - WHILE LOOP  
+   - FOR LOOP  
+   - EXIT and CONTINUE Statements  
+
+4. **SELECT INTO**  
+  - Using SELECT INTO for Variable Assignment  
+  - Selecting into Record Variables  
+  - Handling Multiple Rows with SELECT INTO  
+  - Common Errors with SELECT INTO  
+
+
+5. **Exceptions**  
+   - Predefined Exceptions  
+   - User-defined Exceptions  
+   - EXCEPTION_INIT  
+   - Handling Exceptions with RAISE and RAISE_APPLICATION_ERROR  
+   - Exception Propagation  
+
+6. **Cursors**  
+   - Implicit Cursors  
+   - Explicit Cursors  
+   - Cursor FOR Loops  
+   - Cursor Variables  
+   - Handling Cursor Exceptions  
+
+7. **Records**  
+   - Declaring a Record Type  
+   - Using Records with SELECT INTO  
+   - %ROWTYPE vs %TYPE  
+   - Manipulating Record Values  
+
+8. **Procedures**  
+   - Creating and Calling Procedures  
+   - IN, OUT, and INOUT Parameters  
+   - Procedure Overloading  
+   - Handling Exceptions in Procedures  
+   - Dropping and Altering Procedures  
+
+9. **Functions**  
+   - Creating and Calling Functions  
+   - IN and OUT Parameters in Functions  
+   - Function Overloading  
+   - Returning Values from Functions  
+   - Dropping and Altering Functions
+   - Procuedure vs Functions
+
+10. **Packages**  
+    - Creating and Using Packages  
+    - Package Specification vs Package Body  
+    - Public and Private Procedures/Functions  
+    - Package Initialization  
+    - Package State (Global Variables)  
+    - Advantages of Packages over Procedures and Functions  
+
+11. **Triggers**  
+    - Creating Triggers  
+    - Types of Triggers (BEFORE, AFTER, INSTEAD OF)  
+    - INSTEAD OF Triggers  
+    - Row-Level vs Statement-Level Triggers  
+    - Compound Triggers  
+    - Trigger Timing and Order  
+    - Disabling and Dropping Triggers  
+
+12. **Collections**  
+    - Types of Collections (Associative Arrays, Nested Tables, VARRAYs)  
+    - Creating and Using Collections  
+    - Manipulating Collection Data  
+    - Collection Methods (COUNT, EXISTS, FIRST, LAST)  
+
+13. **Bulk Collect**  
+    - Using BULK COLLECT to Fetch Data into Collections  
+    - LIMIT Clause in BULK COLLECT  
+    - Performance Benefits of BULK COLLECT  
+    - Handling Exceptions with BULK COLLECT  
+    - Fetching Multiple Collections in One Query  
+    - Using FORALL with BULK COLLECT for Efficient DML Operations  
+
+14. **Dynamic SQL**  
+    - Introduction to Dynamic SQL  
+    - EXECUTE IMMEDIATE  
+    - Using Bind Variables with Dynamic SQL  
+    - Building Dynamic SQL for DML and DDL  
+    - Executing Dynamic SQL with RETURNING INTO  
+
+15. **Table Functions**  
+    - Creating and Using Table Functions  
+    - Returning a Table from a Function  
+    - Using Table Functions in SQL Queries  
+
+---
+
+### **4. Performance Tuning** *(10 Hours)*
+
+1. **Read an Execution Plan**  
+2. **Database Statistics**  
+3. **Query Performance**  
+4. **Create Indexes**  
+5. **Why My Query Not Using an Index**  
+6. **Summarize Data Fast with Materialized Views**  
+7. **Joins**  
+   - Hash Join  
+   - Nested Loop Join  
+   - Merge Join  
+   - Join Cardinality  
+8. **Make Inserts, Updates, and Deletes Faster**  
+9. **Find Slow SQL**  
+10. **Further Reading**  
+
+---
+
+### **Course Fee**
+
+| Course Name | Topics Covered | Fee |
+|-------------|----------------|------|
+| SQL only | Basic SQL, Advanced SQL | ₹ 15,000 |
+| SQL + PLSQL | Basic SQL, Advanced SQL, PL/SQL | ₹ 30,000 |
+| SQL + PLSQL + Perf Tuning | Basic SQL, Advanced SQL, PL/SQL, Performance Tuning | ₹ 40,000 |
+
+---
+
+### **Included**
+
+- One-to-One Sessions  
+- Live Session Recording  
+- Project-Specific Assignments  
+- GitHub Training Material Access  
+
+---
+
+This should now include all of the **subtopics** you approved, in the correct sections, with the **TRUNCATE** added to DDL, and the **joins** section in performance tuning updated as you mentioned.
+
+Please let me know if any further adjustments are required!
